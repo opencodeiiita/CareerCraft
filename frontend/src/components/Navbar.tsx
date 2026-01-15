@@ -1,13 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const linkClass = (path: string) =>
+    `text-sm font-medium ${
+      pathname === path
+        ? "text-blue-600 dark:text-blue-400"
+        : "text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+    }`;
+
+  const mobileLinkClass =
+    "block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-black/60">
+    <header
+      className={`sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-black/60 ${
+        scrolled ? "shadow-md" : ""
+      }`}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
@@ -17,21 +40,11 @@ export default function Navbar() {
           </div>
 
           <nav className="hidden items-center gap-8 md:flex">
-            <Link href="/" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-              Home
-            </Link>
-            <Link href="/resume-analysis" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-              Resume Analysis
-            </Link>
-            <Link href="/resume-upload" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-              Upload Resume
-            </Link>
-            <Link href="/cover-letter" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-              Get Cover Letter
-            </Link>
-            <Link href="/about" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-              About
-            </Link>
+            <Link href="/" className={linkClass("/")}>Home</Link>
+            <Link href="/resume-analysis" className={linkClass("/resume-analysis")}>Resume Analysis</Link>
+            <Link href="/resume-upload" className={linkClass("/resume-upload")}>Upload Resume</Link>
+            <Link href="/cover-letter" className={linkClass("/cover-letter")}>Get Cover Letter</Link>
+            <Link href="/about" className={linkClass("/about")}>About</Link>
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -80,30 +93,23 @@ export default function Navbar() {
         {open && (
           <div className="md:hidden">
             <div className="space-y-2 border-t border-zinc-200 py-4 dark:border-zinc-800">
-              <Link href="/" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-                Home
-              </Link>
-              <Link href="/resume-analysis" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-                Resume Analysis
-              </Link>
-              <Link href="/resume-upload" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-                Upload Resume
-              </Link>
-              <Link href="/cover-letter" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-                Get Cover Letter
-              </Link>
-              <Link href="/about" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-                About
-              </Link>
+              <Link href="/" onClick={() => setOpen(false)} className={mobileLinkClass}>Home</Link>
+              <Link href="/resume-analysis" onClick={() => setOpen(false)} className={mobileLinkClass}>Resume Analysis</Link>
+              <Link href="/resume-upload" onClick={() => setOpen(false)} className={mobileLinkClass}>Upload Resume</Link>
+              <Link href="/cover-letter" onClick={() => setOpen(false)} className={mobileLinkClass}>Get Cover Letter</Link>
+              <Link href="/about" onClick={() => setOpen(false)} className={mobileLinkClass}>About</Link>
+
               <div className="flex items-center gap-3 pt-2">
                 <Link
                   href="/signin"
+                  onClick={() => setOpen(false)}
                   className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/signup"
+                  onClick={() => setOpen(false)}
                   className="inline-flex items-center rounded-md bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
                 >
                   Sign up

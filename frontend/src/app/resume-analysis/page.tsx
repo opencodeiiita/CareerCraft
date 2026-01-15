@@ -40,6 +40,7 @@ export default function ResumeAnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [rawTextPreview, setRawTextPreview] = useState<string>("");
+  const [jobDescription, setJobDescription] = useState<string>("");
 
   const skillCount = useMemo(() => analysis?.skills?.length || 0, [analysis]);
   const atsScore = useMemo(
@@ -116,8 +117,39 @@ export default function ResumeAnalysisPage() {
       }
 
       const analyzeData: AnalysisResult = await analyzeRes.json();
+
       setAnalysis(analyzeData);
       setStatus("Analysis complete");
+
+      if (jobDescription.trim().length > 0) {
+        setStatus("Matching resume with job description...");
+      
+        const jobMatchRes = await fetch(
+          `${ML_BASE_URL}/resume/job-match`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              resume_analysis: analyzeData,
+              job_description: jobDescription,
+            }),
+          }
+        );
+      
+        if (jobMatchRes.ok) {
+          const jobMatchData = await jobMatchRes.json();
+      
+          analyzeData.job_match = {
+            match_percentage: jobMatchData.job_fit_score,
+            matched_skills: jobMatchData.matched_skills,
+            missing_skills: jobMatchData.missing_skills,
+            recommendations: jobMatchData.job_feedback,
+          };
+        }
+      }
+      
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unexpected error";
       setError(message);
@@ -317,6 +349,24 @@ export default function ResumeAnalysisPage() {
                     </div>
                   </div>
                 )}
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100 mb-3">
+                    Job Description (optional but recommended)
+                  </label>
+
+                  <textarea
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Paste the job description here..."
+                    rows={6}
+                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                  />
+
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Used to compute resume ↔ job match insights.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

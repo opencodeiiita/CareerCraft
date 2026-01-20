@@ -413,7 +413,7 @@ ${coverLetter.sign_off}`;
                   <div className="space-y-2">
                     {(resumeAnalysis.experience || []).map((exp, index) => (
                       <div key={index} className="text-sm text-zinc-700 dark:text-zinc-300">
-                        <p className="font-medium">{exp.position || exp.title || 'Position'} at {exp.company || 'Company'}</p>
+                        <p className="font-medium">{exp.position || 'Position'} at {exp.company || 'Company'}</p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">{exp.duration || ''}</p>
                       </div>
                     ))}

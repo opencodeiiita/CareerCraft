@@ -33,6 +33,7 @@ export async function signup(
 
   if (data.data?.jwtToken) {
     localStorage.setItem("token", data.data.jwtToken);
+    window.dispatchEvent(new Event("auth-change"));
   }
 
   return data;
@@ -49,6 +50,7 @@ export async function signin(
 
   if (response.data.jwtToken) {
     localStorage.setItem("token", response.data.jwtToken);
+    window.dispatchEvent(new Event("auth-change"));
   }
 
   return response;
@@ -63,6 +65,7 @@ export async function getCurrentUser(): Promise<ApiResponse<{ user: User }>> {
 
 export function logout(): void {
   localStorage.removeItem("token");
+  window.dispatchEvent(new Event("auth-change"));
 }
 
 export function getToken(): string | null {

@@ -10,6 +10,7 @@ const userSchema = new Schema({
     lowercase: true,
     trim: true,
     index: true,
+    unique: true,
   },
   email: {
     type: String,
@@ -22,6 +23,57 @@ const userSchema = new Schema({
     type: String,
     required: [true, "Password is required"],
   },
+  // Profile fields
+  address: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  city: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  state: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  country: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  phone: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  // Coding platform links
+  github: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  leetcode: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  codeforces: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  codechef: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  otherPlatforms: [{
+    name: { type: String, trim: true },
+    url: { type: String, trim: true },
+  }],
   createdAt: {
     type: Date,
     default: Date.now,

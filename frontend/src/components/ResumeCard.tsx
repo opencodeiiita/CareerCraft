@@ -17,9 +17,10 @@ interface Resume {
 interface ResumeCardProps {
   resume: Resume;
   onDelete?: (id: string) => void;
+  onDeleteClick?: (id: string, filename: string) => void;
 }
 
-export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
+export default function ResumeCard({ resume, onDelete, onDeleteClick }: ResumeCardProps) {
   const { filename, uploadedAt, url, mimetype } = resume;
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -37,18 +38,23 @@ export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
   const isPDF = mimetype?.includes('pdf');
 
   const handleDelete = async () => {
+    if (onDeleteClick && resume._id) {
+      onDeleteClick(resume._id, filename);
+      return;
+    }
+
     if (!confirm('Are you sure you want to delete this resume?')) return;
-    
+
     setIsDeleting(true);
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
       await axios.delete(`${apiBase}/resumes/${resume._id}`);
-      
+
       // Notify parent component to refresh the list
       if (onDelete && resume._id) {
         onDelete(resume._id);
       }
-      
+
       // Dispatch event to refresh resume history
       window.dispatchEvent(new CustomEvent('resumesUpdated'));
     } catch (error) {
@@ -65,8 +71,8 @@ export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
       <div className="mb-6">
         {isImage ? (
           <div className="w-full h-48 bg-zinc-100 dark:bg-zinc-900 rounded-lg overflow-hidden">
-            <img 
-              src={url} 
+            <img
+              src={url}
               alt={filename}
               className="w-full h-full object-cover"
             />
@@ -116,16 +122,16 @@ export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
 
       {/* Action Buttons */}
       <div className="grid grid-cols-3 gap-2 mt-6">
-        <a 
-          href={url} 
-          target="_blank" 
-          rel="noreferrer" 
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
           className="px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 text-center text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors no-underline flex items-center justify-center gap-1"
         >
           <FontAwesomeIcon icon={faEye} className="text-sm" />
           View
         </a>
-        <button 
+        <button
           onClick={() => {
             // Create download link with proper Cloudinary parameters
             const downloadUrl = url.replace('/upload/', '/upload/fl_attachment/') + '?_i=1';
@@ -141,7 +147,7 @@ export default function ResumeCard({ resume, onDelete }: ResumeCardProps) {
           <FontAwesomeIcon icon={faDownload} className="text-sm" />
           Download
         </button>
-        <button 
+        <button
           onClick={handleDelete}
           disabled={isDeleting}
           className="px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"

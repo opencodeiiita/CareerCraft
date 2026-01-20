@@ -2,21 +2,53 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { isAuthenticated, logout } from "@/lib/auth";
+import { isAuthenticated, logout, getCurrentUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    setIsLoggedIn(isAuthenticated());
+    const checkAuth = async () => {
+      if (isAuthenticated()) {
+        setIsLoggedIn(true);
+        try {
+          const response = await getCurrentUser();
+          setUsername(response.data.user.username);
+        } catch {
+          // Token might be invalid
+          setIsLoggedIn(false);
+        }
+      }
+    };
+    checkAuth();
+
+    const handleAuthChange = () => {
+      // We check localStorage directly here to be sure, as state update might be pending
+      const token = localStorage.getItem('token');
+      // If token exists, we are logged in. If not, we are logged out.
+      if (token) {
+        setIsLoggedIn(true);
+        // We can fetch user details here if needed, but checkAuth does it too.
+        // checkAuth(); // Let checkAuth handle state sync
+      } else {
+        setIsLoggedIn(false);
+        setUsername(null);
+      }
+      checkAuth(); // Sync full state
+    };
+
+    window.addEventListener("auth-change", handleAuthChange);
+    return () => window.removeEventListener("auth-change", handleAuthChange);
   }, []);
 
   const handleLogout = () => {
     logout();
     setIsLoggedIn(false);
+    setUsername(null);
     router.push("/");
   };
 
@@ -55,12 +87,22 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-3 md:flex">
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
-              >
-                Sign out
-              </button>
+              <>
+                {username && (
+                  <Link
+                    href={`/${username}`}
+                    className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                  >
+                    My Profile
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-red-700"
+                >
+                  Sign out
+                </button>
+              </>
             ) : (
               <>
                 <Link
@@ -130,14 +172,24 @@ export default function Navbar() {
               <Link href="/about" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
                 About
               </Link>
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex flex-col gap-2 pt-2">
                 {isLoggedIn ? (
-                  <button
-                    onClick={handleLogout}
-                    className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
-                  >
-                    Sign out
-                  </button>
+                  <>
+                    {username && (
+                      <Link
+                        href={`/${username}`}
+                        className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                      >
+                        My Profile
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-red-700"
+                    >
+                      Sign out
+                    </button>
+                  </>
                 ) : (
                   <>
                     <Link

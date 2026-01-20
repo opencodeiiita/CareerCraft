@@ -42,12 +42,12 @@ const upload = multer({
 // Direct Cloudinary upload function
 export const uploadToCloudinary = async (file) => {
   console.log(' Starting direct Cloudinary upload for:', file.originalname);
-  
+
   try {
     // Convert buffer to base64 for Cloudinary upload
     const base64String = file.buffer.toString('base64');
     const dataUrl = `data:${file.mimetype};base64,${base64String}`;
-    
+
     // Determine resource type and format based on MIME type
     let resourceType, format;
     if (file.mimetype === 'application/pdf') {
@@ -59,15 +59,17 @@ export const uploadToCloudinary = async (file) => {
     } else {
       throw new Error('Only PDF and MS Word files are allowed.');
     }
-    
+
     // Upload to Cloudinary using base64 data
     const result = await cloudinary.uploader.upload(dataUrl, {
       folder: 'careercraft/resumes',
       resource_type: resourceType,
       public_id: `${file.originalname.split('.')[0]}-${Date.now()}`,
       format: format,
+      access_mode: 'public',  // Make file publicly accessible
+      type: 'upload',         // Ensure public delivery type
     });
-    
+
     console.log(' Cloudinary upload successful:', result);
     return result;
   } catch (error) {

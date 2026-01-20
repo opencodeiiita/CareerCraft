@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import resumeRoutes from "./routes/resume.routes.js";
 import coverLetterRoutes from "./routes/coverLetter.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
 import multer from "multer";
 const app = express();
 
@@ -36,6 +37,9 @@ app.use("/api/resumes", resumeRoutes);
 
 //-----cover letter routes
 app.use("/api/cover-letters", coverLetterRoutes);
+
+//-----profile routes
+app.use("/api/profile", profileRoutes);
 
 //-----health and auth routes   
 app.use("/api/health", healthRoutes);

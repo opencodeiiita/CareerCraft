@@ -37,12 +37,12 @@ export default function ResumeUploadCard() {
     }
     setStatus('Uploading...');
     setError('');
-    
+
     console.log('🚀 Starting upload for file:', file.name);
     console.log('🚀 File size:', (file.size / 1024 / 1024).toFixed(2) + ' MB');
     console.log('🚀 File type:', file.type);
     console.log('🚀 API endpoint:', `${apiBase}/resumes/upload`);
-    
+
     try {
       const form = new FormData();
       form.append('resume', file);
@@ -56,7 +56,7 @@ export default function ResumeUploadCard() {
       console.log('📡 Sending request to:', `${apiBase}/resumes/upload`);
       console.log('📡 Request method: POST');
       console.log('📡 Request headers: Content-Type: multipart/form-data');
-      
+
       // Create a timeout controller
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
@@ -64,11 +64,15 @@ export default function ResumeUploadCard() {
         console.log('⏰ Request aborted due to timeout');
       }, 120000); // 2 minutes
 
+      // Get auth token for user association
+      const token = localStorage.getItem('token');
+
       // Use axios instead of fetch
       const response = await axios.post(`${apiBase}/resumes/upload`, form, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Accept': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         signal: controller.signal,
         timeout: 120000, // 120 seconds timeout for Cloudinary
@@ -88,9 +92,9 @@ export default function ResumeUploadCard() {
       console.log('📡 Response status text:', response.statusText);
       console.log('📡 Response headers:', response.headers);
       console.log('📡 Response data:', response.data);
-      
+
       const body = response.data;
-      
+
       if (!body.success) {
         const msg = body?.message || JSON.stringify(body);
         console.error('❌ Upload failed:', msg);
@@ -104,12 +108,12 @@ export default function ResumeUploadCard() {
       setUploadedResume(body.resume);
       setFile(null);
       setStatus('Upload successful!');
-      
+
       // Clear the success message after 3 seconds
       setTimeout(() => {
         setStatus('');
       }, 3000);
-      
+
       // Dispatch event to refresh resume history
       window.dispatchEvent(new CustomEvent('resumesUpdated'));
     } catch (err) {
@@ -117,7 +121,7 @@ export default function ResumeUploadCard() {
       console.error('❌ Error type:', err.constructor.name);
       console.error('❌ Error message:', err.message);
       console.error('❌ Error code:', err.code);
-      
+
       if (axios.isAxiosError(err)) {
         if (err.code === 'ECONNABORTED') {
           console.error('❌ Request was aborted');
@@ -165,9 +169,9 @@ export default function ResumeUploadCard() {
           Upload Resume
         </label>
         <div className="relative">
-          <input 
-            type="file" 
-            accept=".pdf,.doc,.docx" 
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
             onChange={handleFileChange}
             className="block w-full text-sm text-zinc-500 dark:text-zinc-400
               file:mr-4 file:py-2.5 file:px-4 file:rounded-lg
@@ -198,8 +202,8 @@ export default function ResumeUploadCard() {
       </div>
 
       <div className="flex gap-3">
-        <button 
-          onClick={handleUpload} 
+        <button
+          onClick={handleUpload}
           disabled={!file || status === 'Uploading...'}
           className="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium 
             hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
@@ -207,8 +211,8 @@ export default function ResumeUploadCard() {
         >
           {status === 'Uploading...' ? 'Uploading...' : 'Upload'}
         </button>
-        <button 
-          onClick={handleReset} 
+        <button
+          onClick={handleReset}
           className="px-6 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 
             bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 font-medium
             hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
@@ -226,7 +230,7 @@ export default function ResumeUploadCard() {
             </span>
           </div>
         )}
-        
+
         {error && (
           <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <div className="w-4 h-4 rounded-full bg-red-500"></div>

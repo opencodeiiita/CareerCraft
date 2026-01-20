@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { isAuthenticated } from '@/lib/auth';
 import { getMyCoverLetters, deleteCoverLetter, SavedCoverLetter } from '@/lib/coverLetterApi';
+import CoverLetterCard from '@/components/CoverLetterCard';
 
 export default function MyCoverLettersPage() {
     const router = useRouter();
@@ -177,49 +178,12 @@ export default function MyCoverLettersPage() {
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {coverLetters.map((letter) => (
-                            <div
+                            <CoverLetterCard
                                 key={letter._id}
-                                className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden flex flex-col"
-                            >
-                                {/* Card Header */}
-                                <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-                                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white truncate">
-                                        {letter.companyName}
-                                    </h3>
-                                    <p className="text-sm text-zinc-600 dark:text-zinc-400 truncate">
-                                        {letter.jobTitle}
-                                    </p>
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
-                                        {formatDate(letter.createdAt)}
-                                    </p>
-                                </div>
-
-                                {/* Preview Area */}
-                                <div className="p-4 bg-zinc-50 dark:bg-zinc-900 flex-1 overflow-hidden">
-                                    <div className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-6 whitespace-pre-line">
-                                        {letter.coverLetter.greeting}
-                                        {'\n\n'}
-                                        {letter.coverLetter.body[0]?.substring(0, 200)}...
-                                    </div>
-                                </div>
-
-                                {/* Card Actions */}
-                                <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 flex gap-2">
-                                    <button
-                                        onClick={() => handleDownloadPDF(letter)}
-                                        className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-                                    >
-                                        Download PDF
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(letter._id)}
-                                        disabled={deletingId === letter._id}
-                                        className="rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-200 transition-colors disabled:opacity-50 dark:bg-red-900/30 dark:text-red-200 dark:hover:bg-red-900/50"
-                                    >
-                                        {deletingId === letter._id ? '...' : 'Delete'}
-                                    </button>
-                                </div>
-                            </div>
+                                letter={letter}
+                                onDelete={handleDelete}
+                                onDownload={handleDownloadPDF}
+                            />
                         ))}
                     </div>
                 )}

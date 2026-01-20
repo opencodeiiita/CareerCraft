@@ -8,7 +8,7 @@ export const uploadResume = async (req, res) => {
   console.log('Upload request received');
   console.log('Request body:', req.body);
   console.log('Request file:', req.file);
-  
+
   try {
     if (!req.file) {
       console.log('❌ No file in request');
@@ -25,7 +25,7 @@ export const uploadResume = async (req, res) => {
     // Upload to Cloudinary using direct API
     console.log('🚀 Uploading to Cloudinary...');
     const cloudinaryResult = await uploadToCloudinary(req.file);
-    
+
     // Extract URL and public_id from Cloudinary response
     const url = cloudinaryResult.secure_url;
     const publicId = cloudinaryResult.public_id;
@@ -38,8 +38,10 @@ export const uploadResume = async (req, res) => {
       return res.status(500).json({ success: false, message: 'Failed to get file URL from Cloudinary' });
     }
 
+
     console.log('💾 Creating resume document...');
     const resume = new Resume({
+      userId: req.user?._id,  // Associate resume with authenticated user
       filename: req.file.originalname,
       url,
       publicId,
@@ -49,7 +51,7 @@ export const uploadResume = async (req, res) => {
     });
 
     console.log('📄 Resume document created:', resume);
-    
+
     console.log('💾 Saving to database...');
     const savedResume = await resume.save();
     console.log('✅ Resume saved to database:', savedResume);
@@ -63,10 +65,10 @@ export const uploadResume = async (req, res) => {
         uploadedAt: savedResume.uploadedAt
       }
     };
-    
+
     console.log('📤 SENDING RESPONSE NOW:', response);
     return res.json(response);
-    
+
   } catch (err) {
     console.error('❌ Upload error:', err);
     console.error('❌ Error stack:', err.stack);
@@ -77,21 +79,21 @@ export const uploadResume = async (req, res) => {
 export const deleteResume = async (req, res) => {
   console.log('🗑️ DELETE CONTROLLER HIT');
   console.log('=== DELETE START ===');
-  
+
   try {
     const { id } = req.params;
     console.log('🆔 Resume ID to delete:', id);
-    
+
     // Find resume in database
     const resume = await Resume.findById(id);
     if (!resume) {
       console.log('❌ Resume not found in database');
       return res.status(404).json({ success: false, message: 'Resume not found' });
     }
-    
+
     console.log('✅ Found resume:', resume);
     console.log('🆔 Cloudinary public ID:', resume.publicId);
-    
+
     // Delete from Cloudinary
     if (resume.publicId) {
       console.log('🗑️ Deleting from Cloudinary...');
@@ -105,15 +107,15 @@ export const deleteResume = async (req, res) => {
         // Continue with database deletion even if Cloudinary fails
       }
     }
-    
+
     // Delete from database
     console.log('🗑️ Deleting from database...');
     await Resume.findByIdAndDelete(id);
     console.log('✅ Deleted from database');
-    
+
     console.log('📤 DELETE SUCCESSFUL');
     return res.json({ success: true, message: 'Resume deleted successfully' });
-    
+
   } catch (err) {
     console.error('❌ Delete error:', err);
     console.error('❌ Error stack:', err.stack);

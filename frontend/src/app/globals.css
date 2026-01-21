@@ -1,18 +1,92 @@
 @import "tailwindcss";
 
 :root {
+  /* CareerCraft Brand Colors */
+  --cc-primary-blue: #1e40af;
+  --cc-secondary-blue: #3b82f6;
+  --cc-light-blue: #60a5fa;
+  --cc-sky-blue: #0ea5e9;
+  
+  /* Semantic Colors */
+  --cc-success: #10b981;
+  --cc-warning: #f59e0b;
+  --cc-error: #ef4444;
+  
+  /* Neutral Colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --background-alt: #f9fafb;
+  --foreground: #111827;
+  --foreground-secondary: #6b7280;
+  
+  /* Border and Shadow */
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
+    --background-alt: #111827;
     --foreground: #ededed;
+    --foreground-secondary: #9ca3af;
+    --border-color: #374151;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* CareerCraft Consistent Button Styles */
+.cc-btn-primary {
+  background-color: var(--cc-secondary-blue);
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.cc-btn-primary:hover {
+  background-color: var(--cc-primary-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.cc-btn-secondary {
+  background-color: white;
+  color: var(--cc-primary-blue);
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease-in-out;
+}
+
+.cc-btn-secondary:hover {
+  background-color: var(--background-alt);
+  border-color: var(--cc-secondary-blue);
+}
+
+/* CareerCraft Card Styles */
+.cc-card {
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease-in-out;
+}
+
+.cc-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+

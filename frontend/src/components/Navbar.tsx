@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { isAuthenticated, logout, getCurrentUser } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -57,8 +58,13 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link href="/" className="text-xl font-semibold tracking-tight">
-              CareerCraft
+            <Link href="/" className="flex items-center gap-2">
+              <img
+                src="/text.svg"
+                alt="CareerCraft"
+                className="h-13 sm:h-12"
+                style={pathname === '/about' ? { filter: 'drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8))' } : {}}
+              />
             </Link>
           </div>
 

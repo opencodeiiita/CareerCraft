@@ -3,26 +3,35 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
-      <section className="bg-zinc-50 py-20 dark:bg-black">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-sky-50 py-20 dark:from-gray-900 dark:via-black dark:to-gray-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl dark:text-white">
+            {/* Logo */}
+            <div className="flex justify-center mb-6">
+              <img
+                src="/logo.svg"
+                alt="CareerCraft Logo"
+                className="h-24 w-24 sm:h-32 sm:w-32"
+              />
+            </div>
+
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
               AI-powered resume insights and job matching
             </h1>
-            <p className="mt-4 text-lg leading-7 text-zinc-600 dark:text-zinc-300">
+            <p className="mt-4 text-lg leading-7 text-gray-600 dark:text-gray-300">
               CareerCraft helps you refine your resume for ATS, discover the right roles,
               and craft tailored cover letters — all in one place.
             </p>
             <div className="mt-8 flex items-center justify-center gap-3">
               <Link
                 href="/resume-upload"
-                className="inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
+                className="cc-btn-primary inline-flex items-center"
               >
                 Upload Resume
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                className="cc-btn-secondary inline-flex items-center"
               >
                 Learn more
               </Link>
@@ -75,8 +84,8 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-violet-600/10 text-violet-700 dark:text-violet-400">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-                    <path d="M6.75 5A2.75 2.75 0 019.5 2.25h5A2.75 2.75 0 0117.25 5v14A2.75 2.75 0 0114.5 21.75h-5A2.75 2.75 0 016.75 19V5z"/>
-                    <path d="M8.75 7.5h5.5a.75.75 0 010 1.5h-5.5a.75.75 0 010-1.5zm0 3h5.5a.75.75 0 010 1.5h-5.5a.75.75 0 010-1.5zm0 3h3a.75.75 0 010 1.5h-3a.75.75 0 010-1.5z"/>
+                    <path d="M6.75 5A2.75 2.75 0 019.5 2.25h5A2.75 2.75 0 0117.25 5v14A2.75 2.75 0 0114.5 21.75h-5A2.75 2.75 0 016.75 19V5z" />
+                    <path d="M8.75 7.5h5.5a.75.75 0 010 1.5h-5.5a.75.75 0 010-1.5zm0 3h5.5a.75.75 0 010 1.5h-5.5a.75.75 0 010-1.5zm0 3h3a.75.75 0 010 1.5h-3a.75.75 0 010-1.5z" />
                   </svg>
                 </span>
                 <h3 className="text-base font-semibold text-zinc-900 dark:text-white">AI Cover Letter</h3>

@@ -123,7 +123,7 @@ export default function ResumeAnalysisPage() {
 
       if (jobDescription.trim().length > 0) {
         setStatus("Matching resume with job description...");
-      
+
         const jobMatchRes = await fetch(
           `${ML_BASE_URL}/resume/job-match`,
           {
@@ -137,10 +137,10 @@ export default function ResumeAnalysisPage() {
             }),
           }
         );
-      
+
         if (jobMatchRes.ok) {
           const jobMatchData = await jobMatchRes.json();
-      
+
           analyzeData.job_match = {
             match_percentage: jobMatchData.job_fit_score,
             matched_skills: jobMatchData.matched_skills,
@@ -149,7 +149,7 @@ export default function ResumeAnalysisPage() {
           };
         }
       }
-      
+
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unexpected error";
       setError(message);
@@ -297,7 +297,7 @@ export default function ResumeAnalysisPage() {
                 <button
                   onClick={analyzeResume}
                   disabled={isLoading || !file}
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none disabled:cursor-not-allowed dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500 transition-colors"
                 >
                   {isLoading ? "Analyzing..." : "Analyze Resume"}
                 </button>
@@ -320,7 +320,7 @@ export default function ResumeAnalysisPage() {
                       <div className="h-2 w-2 rounded-full bg-blue-500" />
                       <p className="text-xs font-semibold uppercase tracking-wider text-zinc-300">Extracted preview</p>
                     </div>
-                    <div 
+                    <div
                       className="max-h-48 overflow-y-auto rounded-lg border border-zinc-700 bg-black p-3 font-mono text-xs leading-relaxed text-zinc-200"
                       style={{
                         scrollbarWidth: 'thin',

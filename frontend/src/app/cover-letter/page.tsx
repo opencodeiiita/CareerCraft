@@ -295,7 +295,7 @@ ${coverLetter.sign_off}`;
               <button
                 onClick={handleResumeAnalysis}
                 disabled={!resumeText || loading !== ''}
-                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
+                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none disabled:cursor-not-allowed dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500 transition-colors"
               >
                 {loading === 'Analyzing resume...' ? (
                   <>Analyzing...</>
@@ -365,7 +365,7 @@ ${coverLetter.sign_off}`;
               <button
                 onClick={handleCoverLetterGeneration}
                 disabled={!resumeAnalysis || !jobDetails.companyName || !jobDetails.jobTitle || loading !== ''}
-                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
+                className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none disabled:cursor-not-allowed dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500 transition-colors"
               >
                 {loading === 'Generating cover letter...' ? (
                   <>Generating...</>

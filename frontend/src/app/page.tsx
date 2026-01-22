@@ -9,9 +9,14 @@ export default function Home() {
             {/* Logo */}
             <div className="flex justify-center mb-6">
               <img
-                src="/logo.svg"
+                src="/logo-white.svg"
                 alt="CareerCraft Logo"
-                className="h-24 w-24 sm:h-32 sm:w-32"
+                className="h-24 w-24 sm:h-32 sm:w-32 block dark:hidden"
+              />
+              <img
+                src="/logo-black.svg"
+                alt="CareerCraft Logo"
+                className="h-24 w-24 sm:h-32 sm:w-32 hidden dark:block"
               />
             </div>
 

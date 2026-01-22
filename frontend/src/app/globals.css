@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   /* CareerCraft Brand Colors */
@@ -24,14 +25,12 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --background-alt: #111827;
-    --foreground: #ededed;
-    --foreground-secondary: #9ca3af;
-    --border-color: #374151;
-  }
+.dark {
+  --background: #0a0a0a;
+  --background-alt: #111827;
+  --foreground: #ededed;
+  --foreground-secondary: #9ca3af;
+  --border-color: #374151;
 }
 
 body {
@@ -46,7 +45,8 @@ body {
 
 /* CareerCraft Consistent Button Styles */
 .cc-btn-primary {
-  background-color: var(--cc-secondary-blue);
+  background-color: #2563eb;
+  /* Blue-600 */
   color: white;
   padding: 0.625rem 1.25rem;
   border-radius: 0.5rem;
@@ -55,7 +55,8 @@ body {
 }
 
 .cc-btn-primary:hover {
-  background-color: var(--cc-primary-blue);
+  background-color: #1d4ed8;
+  /* Blue-700 */
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }

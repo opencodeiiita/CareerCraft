@@ -48,9 +48,14 @@ export default function SignUpPage() {
         {/* Logo */}
         <div className="flex justify-center">
           <img
-            src="/logo.svg"
+            src="/logo-white.svg"
             alt="CareerCraft Logo"
-            className="h-20 w-20"
+            className="h-20 w-20 block dark:hidden"
+          />
+          <img
+            src="/logo-black.svg"
+            alt="CareerCraft Logo"
+            className="h-20 w-20 hidden dark:block"
           />
         </div>
 

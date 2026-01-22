@@ -206,8 +206,8 @@ export default function ResumeUploadCard() {
           onClick={handleUpload}
           disabled={!file || status === 'Uploading...'}
           className="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium 
-            hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-            disabled:hover:bg-blue-600"
+            hover:bg-blue-700 transition-colors disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none disabled:cursor-not-allowed
+            dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
         >
           {status === 'Uploading...' ? 'Uploading...' : 'Upload'}
         </button>

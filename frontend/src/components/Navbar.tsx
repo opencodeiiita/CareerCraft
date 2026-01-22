@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { isAuthenticated, logout, getCurrentUser } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -60,10 +61,14 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
               <img
-                src="/text.svg"
+                src="/text-white.svg"
                 alt="CareerCraft"
-                className="h-13 sm:h-12"
-                style={pathname === '/about' ? { filter: 'drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8))' } : {}}
+                className="h-13 sm:h-12 block dark:hidden"
+              />
+              <img
+                src="/text-black.svg"
+                alt="CareerCraft"
+                className="h-13 sm:h-12 hidden dark:block"
               />
             </Link>
           </div>
@@ -92,6 +97,7 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
+            <ThemeToggle />
             {isLoggedIn ? (
               <>
                 {username && (
@@ -212,6 +218,10 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
+              </div>
+              <div className="flex items-center justify-between px-1 py-2 border-t border-zinc-200 dark:border-zinc-800 mt-2">
+                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Theme</span>
+                <ThemeToggle />
               </div>
             </div>
           </div>

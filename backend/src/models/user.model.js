@@ -21,7 +21,24 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: [true, "Password is required"],
+    required: function () {
+      return (
+        !this?.oauthProviders?.google?.id && !this?.oauthProviders?.github?.id
+      );
+    },
+  },
+  oauthProviders: {
+    google: {
+      id: { type: String, default: "" },
+      email: { type: String, trim: true, lowercase: true, default: "" },
+      verified: { type: Boolean, default: false },
+    },
+    github: {
+      id: { type: String, default: "" },
+      email: { type: String, trim: true, lowercase: true, default: "" },
+      verified: { type: Boolean, default: false },
+      username: { type: String, trim: true, default: "" },
+    },
   },
   // Profile fields
   address: {
@@ -70,10 +87,12 @@ const userSchema = new Schema({
     trim: true,
     default: "",
   },
-  otherPlatforms: [{
-    name: { type: String, trim: true },
-    url: { type: String, trim: true },
-  }],
+  otherPlatforms: [
+    {
+      name: { type: String, trim: true },
+      url: { type: String, trim: true },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -85,10 +104,17 @@ userSchema.pre("save", async function () {
     return;
   }
 
+  if (!this.password) {
+    return;
+  }
+
   this.password = await bcrypt.hash(this.password, 10);
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  if (!this.password) {
+    return false;
+  }
   return await bcrypt.compare(password, this.password);
 };
 

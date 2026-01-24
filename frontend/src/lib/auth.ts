@@ -1,5 +1,8 @@
 import { apiRequest, ApiResponse } from "./api";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
 export interface User {
   _id: string;
   username: string;
@@ -75,4 +78,16 @@ export function getToken(): string | null {
 
 export function isAuthenticated(): boolean {
   return !!getToken();
+}
+
+export type OAuthProvider = "google" | "github";
+
+export function buildOAuthUrl(provider: OAuthProvider): string {
+  if (typeof window === "undefined") {
+    return `${API_BASE_URL}/auth/oauth/${provider}`;
+  }
+
+  const redirect = `${window.location.origin}/oauth/callback`;
+  const params = new URLSearchParams({ redirect });
+  return `${API_BASE_URL}/auth/oauth/${provider}?${params.toString()}`;
 }

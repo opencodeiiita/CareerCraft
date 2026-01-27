@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import User from "../models/user.model.js";
 import Resume from "../models/resume.model.js";
 import CoverLetter from "../models/coverLetter.model.js";
+import redis from "../utils/redisClient.ts";
 
 /**
  * Get profile by username
@@ -11,38 +12,63 @@ import CoverLetter from "../models/coverLetter.model.js";
  * Only the owner can view their profile
  */
 const getProfile = asyncHandler(async (req, res) => {
-    const { username } = req.params;
-    const requestingUser = req.user;
-
-    // Find the profile user
-    const profileUser = await User.findOne({ username: username.toLowerCase() }).select("-password");
-
-    if (!profileUser) {
-        throw new ApiError(404, "User not found");
+  const { username } = req.params;
+  const requestingUser = req.user;
+  const dashboardCacheKey = `dashboard:${requestingUser._id}`;
+  // Try Redis cache first
+  try {
+    const cached = await redis.get(dashboardCacheKey);
+    if (cached) {
+      const payload = JSON.parse(cached);
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            payload,
+            "Profile fetched successfully (cached)",
+          ),
+        );
     }
+  } catch (e) {}
 
-    // Security check: Only allow users to view their own profile
-    if (profileUser._id.toString() !== requestingUser._id.toString()) {
-        throw new ApiError(403, "You can only view your own profile");
-    }
+  // Find the profile user
+  const profileUser = await User.findOne({
+    username: username.toLowerCase(),
+  }).select("-password");
 
-    // Get user's resumes
-    const resumes = await Resume.find({ userId: profileUser._id })
-        .sort({ createdAt: -1 })
-        .lean();
+  if (!profileUser) {
+    throw new ApiError(404, "User not found");
+  }
 
-    // Get user's cover letters
-    const coverLetters = await CoverLetter.find({ userId: profileUser._id })
-        .sort({ createdAt: -1 })
-        .lean();
+  // Security check: Only allow users to view their own profile
+  if (profileUser._id.toString() !== requestingUser._id.toString()) {
+    throw new ApiError(403, "You can only view your own profile");
+  }
 
-    return res.status(200).json(
-        new ApiResponse(200, {
-            profile: profileUser,
-            resumes,
-            coverLetters,
-        }, "Profile fetched successfully")
-    );
+  // Get user's resumes
+  const resumes = await Resume.find({ userId: profileUser._id })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // Get user's cover letters
+  const coverLetters = await CoverLetter.find({ userId: profileUser._id })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const payload = {
+    profile: profileUser,
+    resumes,
+    coverLetters,
+  };
+  // Store in Redis cache (TTL: 5 min)
+  try {
+    await redis.set(dashboardCacheKey, JSON.stringify(payload), "EX", 300);
+  } catch (e) {}
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, payload, "Profile fetched successfully"));
 });
 
 /**
@@ -50,46 +76,53 @@ const getProfile = asyncHandler(async (req, res) => {
  * PUT /api/profile/update
  */
 const updateProfile = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    const {
-        address,
-        city,
-        state,
-        country,
-        phone,
-        github,
-        leetcode,
-        codeforces,
-        codechef,
-        otherPlatforms,
-    } = req.body;
+  const userId = req.user._id;
+  const {
+    address,
+    city,
+    state,
+    country,
+    phone,
+    github,
+    leetcode,
+    codeforces,
+    codechef,
+    otherPlatforms,
+  } = req.body;
 
-    // Build update object with only provided fields
-    const updateFields = {};
+  // Build update object with only provided fields
+  const updateFields = {};
 
-    if (address !== undefined) updateFields.address = address.trim();
-    if (city !== undefined) updateFields.city = city.trim();
-    if (state !== undefined) updateFields.state = state.trim();
-    if (country !== undefined) updateFields.country = country.trim();
-    if (phone !== undefined) updateFields.phone = phone.trim();
-    if (github !== undefined) updateFields.github = github.trim();
-    if (leetcode !== undefined) updateFields.leetcode = leetcode.trim();
-    if (codeforces !== undefined) updateFields.codeforces = codeforces.trim();
-    if (codechef !== undefined) updateFields.codechef = codechef.trim();
-    if (otherPlatforms !== undefined) updateFields.otherPlatforms = otherPlatforms;
+  if (address !== undefined) updateFields.address = address.trim();
+  if (city !== undefined) updateFields.city = city.trim();
+  if (state !== undefined) updateFields.state = state.trim();
+  if (country !== undefined) updateFields.country = country.trim();
+  if (phone !== undefined) updateFields.phone = phone.trim();
+  if (github !== undefined) updateFields.github = github.trim();
+  if (leetcode !== undefined) updateFields.leetcode = leetcode.trim();
+  if (codeforces !== undefined) updateFields.codeforces = codeforces.trim();
+  if (codechef !== undefined) updateFields.codechef = codechef.trim();
+  if (otherPlatforms !== undefined)
+    updateFields.otherPlatforms = otherPlatforms;
 
-    const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $set: updateFields },
-        { new: true, runValidators: true }
-    ).select("-password");
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $set: updateFields },
+    { new: true, runValidators: true },
+  ).select("-password");
 
-    if (!updatedUser) {
-        throw new ApiError(404, "User not found");
-    }
+  if (!updatedUser) {
+    throw new ApiError(404, "User not found");
+  }
 
-    return res.status(200).json(
-        new ApiResponse(200, { profile: updatedUser }, "Profile updated successfully")
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { profile: updatedUser },
+        "Profile updated successfully",
+      ),
     );
 });
 
@@ -98,13 +131,13 @@ const updateProfile = asyncHandler(async (req, res) => {
  * GET /api/profile/resumes
  */
 const getMyResumes = asyncHandler(async (req, res) => {
-    const resumes = await Resume.find({ userId: req.user._id })
-        .sort({ createdAt: -1 })
-        .lean();
+  const resumes = await Resume.find({ userId: req.user._id })
+    .sort({ createdAt: -1 })
+    .lean();
 
-    return res.status(200).json(
-        new ApiResponse(200, { resumes }, "Resumes fetched successfully")
-    );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { resumes }, "Resumes fetched successfully"));
 });
 
 export { getProfile, updateProfile, getMyResumes };

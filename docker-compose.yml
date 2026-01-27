@@ -38,6 +38,22 @@ services:
       # CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       # CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       # JWT_SECRET: ${JWT_SECRET}
+  # Redis Service
+  redis:
+    image: redis:7.2
+    container_name: careercraft-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # REDIS_PASSWORD: yourpassword # Uncomment if using password
+    networks:
+      - careercraft-network
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # REDIS_PASSWORD: yourpassword # Uncomment if using password
       # GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       # GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       # GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}

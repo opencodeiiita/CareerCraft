@@ -3,6 +3,13 @@ import { uploadToCloudinary } from "../middleware/upload.middleware.js";
 import { v2 as cloudinary } from "cloudinary";
 import axios from "axios";
 import FormData from "form-data";
+import redis from "../utils/redisClient.ts";
+import crypto from "crypto";
+
+// Helper to get job hash
+function getJobHash(jobDescription) {
+  return crypto.createHash("sha256").update(jobDescription).digest("hex");
+}
 
 export const uploadResume = async (req, res) => {
   try {
@@ -20,43 +27,104 @@ export const uploadResume = async (req, res) => {
     const publicId = cloudinaryResult.public_id;
 
     if (!url) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Failed to get file URL from Cloudinary",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Failed to get file URL from Cloudinary",
+      });
     }
 
     const mlBaseUrl = process.env.ML_SERVICE_URL;
 
     let resumeText = "";
     let analysisResult = null;
+    let jobMatchResult = null;
+    // Generate hash for resume content
+    const resumeHash = crypto
+      .createHash("sha256")
+      .update(req.file.buffer)
+      .digest("hex");
+    const cacheKey = `resume:analysis:${resumeHash}`;
+    // Check Redis cache first
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        analysisResult = JSON.parse(cached);
+      }
+    } catch (e) {
+      // Redis unavailable, fallback gracefully
+    }
+
+    // Job match caching (if job description provided)
+    let jobDescription = req.body?.jobDescription;
+    let jobHash = jobDescription ? getJobHash(jobDescription) : null;
+    let jobMatchCacheKey = null;
+    if (jobDescription) {
+      jobMatchCacheKey = `jobmatch:${resumeHash}:${jobHash}`;
+      try {
+        const cachedMatch = await redis.get(jobMatchCacheKey);
+        if (cachedMatch) {
+          jobMatchResult = JSON.parse(cachedMatch);
+        }
+      } catch (e) {}
+    }
 
     try {
-      const formData = new FormData();
-      formData.append("file", req.file.buffer, {
-        filename: req.file.originalname,
-        contentType: req.file.mimetype,
-      });
+      if (!analysisResult) {
+        const formData = new FormData();
+        formData.append("file", req.file.buffer, {
+          filename: req.file.originalname,
+          contentType: req.file.mimetype,
+        });
 
-      const extractRes = await axios.post(
-        `${mlBaseUrl}/resume/extract-text`,
-        formData,
-        {
-          headers: formData.getHeaders(),
-          maxBodyLength: Infinity,
-          maxContentLength: Infinity,
-        },
-      );
+        const extractRes = await axios.post(
+          `${mlBaseUrl}/resume/extract-text`,
+          formData,
+          {
+            headers: formData.getHeaders(),
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity,
+          },
+        );
 
-      resumeText = extractRes.data?.text || "";
+        resumeText = extractRes.data?.text || "";
 
-      const analyzeRes = await axios.post(`${mlBaseUrl}/resume/analyze`, {
-        content: resumeText,
-      });
+        const analyzeRes = await axios.post(`${mlBaseUrl}/resume/analyze`, {
+          content: resumeText,
+        });
 
-      analysisResult = analyzeRes.data;
+        analysisResult = analyzeRes.data;
+        // Store in Redis cache (TTL: 48h)
+        try {
+          await redis.set(
+            cacheKey,
+            JSON.stringify(analysisResult),
+            "EX",
+            172800,
+          );
+        } catch (e) {
+          // Redis unavailable, fallback gracefully
+        }
+      }
+
+      // Job match ML call and cache
+      if (jobDescription && !jobMatchResult) {
+        try {
+          const matchRes = await axios.post(`${mlBaseUrl}/job/match`, {
+            resume: resumeText,
+            job: jobDescription,
+          });
+          jobMatchResult = matchRes.data;
+          // Store in Redis cache (TTL: 24h)
+          await redis.set(
+            jobMatchCacheKey,
+            JSON.stringify(jobMatchResult),
+            "EX",
+            86400,
+          );
+        } catch (e) {
+          // Fallback gracefully
+        }
+      }
     } catch (analysisError) {
       if (publicId) {
         try {
@@ -84,11 +152,17 @@ export const uploadResume = async (req, res) => {
       size: req.file.size,
       mimetype: req.file.mimetype,
       resumeText,
-      analysisResult,
+      analysisResult: {
+        ...analysisResult,
+        job_match: jobMatchResult || analysisResult?.job_match || null,
+      },
       uploadedAt: new Date(),
     });
 
     const savedResume = await resume.save();
+
+    // Invalidate old cache if resume is re-uploaded/edited (new hash)
+    // Optionally, you can delete previous cache keys if you store them per user/resumeId
 
     const response = {
       success: true,
@@ -118,6 +192,22 @@ export const deleteResume = async (req, res) => {
 
     // Find resume in database
     const resume = await Resume.findById(id);
+    // Invalidate Redis cache for resume analysis and job match
+    if (resume) {
+      try {
+        const resumeHash = resume.resumeText
+          ? require("crypto")
+              .createHash("sha256")
+              .update(resume.resumeText)
+              .digest("hex")
+          : null;
+        if (resumeHash) {
+          await redis.del(`resume:analysis:${resumeHash}`);
+          // Optionally, delete job match keys if you have job hashes stored or can enumerate them
+          // Example: await redis.del(`jobmatch:${resumeHash}:*`); // Requires Redis scan/del for pattern
+        }
+      } catch (e) {}
+    }
     if (!resume) {
       return res
         .status(404)

@@ -21,16 +21,19 @@ export default function BlogsPage() {
         >
           All
         </button>
-        {BLOG_CATEGORIES.map((cat) => (
-          <button
-            key={cat.value}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-1 ${selected === cat.value ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:text-white" : "bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-200 dark:border-zinc-700"}`}
-            onClick={() => setSelected(cat.value)}
-          >
-            <span>{cat.icon}</span>
-            {cat.label}
-          </button>
-        ))}
+        {BLOG_CATEGORIES.map((cat) => {
+          const Icon = cat.icon;
+          return (
+            <button
+              key={cat.value}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-1 ${selected === cat.value ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:text-white" : "bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-200 dark:border-zinc-700"}`}
+              onClick={() => setSelected(cat.value)}
+            >
+              <Icon size={18} className="mr-1" />
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Blog Cards Grid */}

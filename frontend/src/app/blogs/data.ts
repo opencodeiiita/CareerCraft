@@ -13,16 +13,18 @@ export interface Blog {
   image?: string;
 }
 
+import { Mic, Briefcase, UserCheck, Repeat, FileText } from "lucide-react";
+
 export const BLOG_CATEGORIES: {
   label: string;
   value: BlogCategory;
-  icon: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
 }[] = [
-  { label: "Interview Experience", value: "Interview Experience", icon: "🎤" },
-  { label: "First Internship", value: "First Internship", icon: "🧑‍💼" },
-  { label: "First Job", value: "First Job", icon: "💼" },
-  { label: "Career Transition", value: "Career Transition", icon: "🔄" },
-  { label: "Resume Guide", value: "Resume Guide", icon: "📄" },
+  { label: "Interview Experience", value: "Interview Experience", icon: Mic },
+  { label: "First Internship", value: "First Internship", icon: UserCheck },
+  { label: "First Job", value: "First Job", icon: Briefcase },
+  { label: "Career Transition", value: "Career Transition", icon: Repeat },
+  { label: "Resume Guide", value: "Resume Guide", icon: FileText },
 ];
 
 export const BLOGS: Blog[] = [

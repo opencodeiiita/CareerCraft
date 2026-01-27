@@ -48,6 +48,21 @@ const Footer = () => {
         {/* Divider */}
         <div className="max-w-5xl mx-auto border-t border-zinc-200 dark:border-slate-800 mb-4" />
 
+        {/* Footer Links */}
+        <div className="flex justify-center gap-6 mb-2">
+          <a
+            href="/about"
+            className="text-zinc-600 dark:text-slate-300 hover:underline text-sm"
+          >
+            About
+          </a>
+          <a
+            href="/blogs"
+            className="text-zinc-600 dark:text-slate-300 hover:underline text-sm"
+          >
+            Blogs
+          </a>
+        </div>
         {/* Copyright */}
         <div className="text-center text-md text-zinc-500 dark:text-slate-500 tracking-wide">
           © 2025 Career Craft. All rights reserved.

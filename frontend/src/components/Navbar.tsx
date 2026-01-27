@@ -30,7 +30,7 @@ export default function Navbar() {
 
     const handleAuthChange = () => {
       // We check localStorage directly here to be sure, as state update might be pending
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       // If token exists, we are logged in. If not, we are logged out.
       if (token) {
         setIsLoggedIn(true);
@@ -74,24 +74,48 @@ export default function Navbar() {
           </div>
 
           <nav className="hidden items-center gap-8 md:flex">
-            <Link href="/" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+            <Link
+              href="/"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
               Home
             </Link>
-            <Link href="/resume-analysis" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+            <Link
+              href="/resume-analysis"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
               Resume Analysis
             </Link>
-            <Link href="/resume-upload" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+            <Link
+              href="/resume-upload"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
               My Resumes
             </Link>
-            <Link href="/cover-letter" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+            <Link
+              href="/cover-letter"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
               Get Cover Letter
             </Link>
             {isLoggedIn && (
-              <Link href="/my-cover-letters" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              <Link
+                href="/my-cover-letters"
+                className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
                 My Cover Letters
               </Link>
             )}
-            <Link href="/about" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+            <Link
+              href="/blogs"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
+              Blogs
+            </Link>
+            <Link
+              href="/about"
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
               About
             </Link>
           </nav>
@@ -164,24 +188,48 @@ export default function Navbar() {
         {open && (
           <div className="md:hidden">
             <div className="space-y-2 border-t border-zinc-200 py-4 dark:border-zinc-800">
-              <Link href="/" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              <Link
+                href="/"
+                className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
                 Home
               </Link>
-              <Link href="/resume-analysis" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              <Link
+                href="/resume-analysis"
+                className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
                 Resume Analysis
               </Link>
-              <Link href="/resume-upload" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              <Link
+                href="/resume-upload"
+                className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
                 Upload Resume
               </Link>
-              <Link href="/cover-letter" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              <Link
+                href="/cover-letter"
+                className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
                 Get Cover Letter
               </Link>
               {isLoggedIn && (
-                <Link href="/my-cover-letters" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+                <Link
+                  href="/my-cover-letters"
+                  className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+                >
                   My Cover Letters
                 </Link>
               )}
-              <Link href="/about" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              <Link
+                href="/blogs"
+                className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
+                Blogs
+              </Link>
+              <Link
+                href="/about"
+                className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              >
                 About
               </Link>
               <div className="flex flex-col gap-2 pt-2">
@@ -220,7 +268,9 @@ export default function Navbar() {
                 )}
               </div>
               <div className="flex items-center justify-between px-1 py-2 border-t border-zinc-200 dark:border-zinc-800 mt-2">
-                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Theme</span>
+                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Theme
+                </span>
                 <ThemeToggle />
               </div>
             </div>

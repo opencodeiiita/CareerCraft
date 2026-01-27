@@ -22,7 +22,14 @@ The backend follows a standard **MVC (Model-View-Controller)** pattern:
 *   **Database**: MongoDB (Mongoose ODM)
 *   **Storage**: Cloudinary (for Resumes)
 *   **Auth**: JSON Web Tokens (JWT) + Bcrypt
+*   **Rate Limiting**: `express-rate-limit` + Redis (Abuse Protection)
 *   **Validation**: Zod (implied) / Manual checks
+
+## Middleware
+*   **Security**: `helmet`, `cors`
+*   **Rate Limiter**: Global, Auth, and Service-specific limiters.
+*   **Auth**: `verifyJWT` (Bearer Token)
+*   **File Handling**: `multer` (Multipart uploads)
 
 ## Key Directories
 *   `src/app.js`: Application setup (Middleware, CORS, Routes).

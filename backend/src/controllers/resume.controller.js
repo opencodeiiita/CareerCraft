@@ -3,7 +3,7 @@ import { uploadToCloudinary } from "../middleware/upload.middleware.js";
 import { v2 as cloudinary } from "cloudinary";
 import axios from "axios";
 import FormData from "form-data";
-import redis from "../utils/redisClient.ts";
+import redis from "../utils/redisClient.js";
 import crypto from "crypto";
 
 // Helper to get job hash
@@ -65,7 +65,7 @@ export const uploadResume = async (req, res) => {
         if (cachedMatch) {
           jobMatchResult = JSON.parse(cachedMatch);
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     try {
@@ -197,16 +197,16 @@ export const deleteResume = async (req, res) => {
       try {
         const resumeHash = resume.resumeText
           ? require("crypto")
-              .createHash("sha256")
-              .update(resume.resumeText)
-              .digest("hex")
+            .createHash("sha256")
+            .update(resume.resumeText)
+            .digest("hex")
           : null;
         if (resumeHash) {
           await redis.del(`resume:analysis:${resumeHash}`);
           // Optionally, delete job match keys if you have job hashes stored or can enumerate them
           // Example: await redis.del(`jobmatch:${resumeHash}:*`); // Requires Redis scan/del for pattern
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     if (!resume) {
       return res

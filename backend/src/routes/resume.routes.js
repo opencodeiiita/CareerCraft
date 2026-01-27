@@ -7,9 +7,10 @@ import {
   deleteResume,
 } from "../controllers/resume.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
+import { mlServiceLimiter } from "../middleware/rateLimiter.js";
 
 // POST /api/resumes/upload - Protected route (requires auth to associate user)
-router.post("/upload", verifyJWT, upload.single("resume"), (req, res) => {
+router.post("/upload", mlServiceLimiter, verifyJWT, upload.single("resume"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({
       success: false,

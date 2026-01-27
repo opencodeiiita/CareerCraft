@@ -10,12 +10,13 @@ import {
   oauthStatus,
 } from "../controllers/oauth.controllers.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
+import { authLimiter } from "../middleware/rateLimiter.js";
 
 const router = Router();
 
-router.post("/signup", signup);
+router.post("/signup", authLimiter, signup);
 
-router.post("/signin", signin);
+router.post("/signin", authLimiter, signin);
 router.get("/me", verifyJWT, getCurrentUser);
 router.get("/oauth/status", oauthStatus);
 router.get("/oauth/:provider", startOAuth);

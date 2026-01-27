@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 //   try {
 //     // Import the Resume model
 //     const { default: Resume } = await import('./models/resume.model.js');
-    
+
 //     // Try to drop the index
 //     await Resume.collection.dropIndex('cloudinaryPublicId_1');
 //     console.log('✅ Dropped problematic index');
@@ -26,6 +26,10 @@ connectDB()
   .then(async () => {
     // Drop the problematic index
     // await dropProblematicIndex();
-    
+
     app.listen(PORT);
   })
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  });

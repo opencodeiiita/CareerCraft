@@ -4,7 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import User from "../models/user.model.js";
 import Resume from "../models/resume.model.js";
 import CoverLetter from "../models/coverLetter.model.js";
-import redis from "../utils/redisClient.ts";
+import redis from "../utils/redisClient.js";
 
 /**
  * Get profile by username
@@ -30,7 +30,7 @@ const getProfile = asyncHandler(async (req, res) => {
           ),
         );
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // Find the profile user
   const profileUser = await User.findOne({
@@ -64,7 +64,7 @@ const getProfile = asyncHandler(async (req, res) => {
   // Store in Redis cache (TTL: 5 min)
   try {
     await redis.set(dashboardCacheKey, JSON.stringify(payload), "EX", 300);
-  } catch (e) {}
+  } catch (e) { }
 
   return res
     .status(200)

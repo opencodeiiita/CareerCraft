@@ -7,7 +7,10 @@ import resumeRoutes from "./routes/resume.routes.js";
 import coverLetterRoutes from "./routes/coverLetter.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import multer from "multer";
+import { globalLimiter } from "./middleware/rateLimiter.js";
 const app = express();
+
+app.use(globalLimiter);
 
 
 

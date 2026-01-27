@@ -2,7 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import CoverLetter from "../models/coverLetter.model.js";
-import redis from "../utils/redisClient.ts";
+import redis from "../utils/redisClient.js";
 import crypto from "crypto";
 
 /**
@@ -55,7 +55,7 @@ const saveCoverLetter = asyncHandler(async (req, res) => {
   // Invalidate draft cache on save
   try {
     await redis.del(draftCacheKey);
-  } catch (e) {}
+  } catch (e) { }
 
   return res
     .status(201)

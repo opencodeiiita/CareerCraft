@@ -36,7 +36,7 @@ export const BLOGS: Blog[] = [
     description:
       "A detailed account of my technical and HR interviews at Google, with tips for each round.",
     category: "Interview Experience",
-    url: "https://blog.example.com/google-interview-experience",
+    url: "https://www.freecodecamp.org/news/how-to-prepare-for-technical-interviews/",
   },
   {
     id: "2",
@@ -44,7 +44,7 @@ export const BLOGS: Blog[] = [
     description:
       "How I prepared for and cleared all rounds at Amazon for a Software Development Engineer role.",
     category: "Interview Experience",
-    url: "https://blog.example.com/amazon-sde-interview",
+    url: "https://www.linkedin.com/pulse/10-most-common-interview-questions-answers-2024-michael-page/",
   },
   {
     id: "3",
@@ -52,7 +52,7 @@ export const BLOGS: Blog[] = [
     description:
       "Campus placement experience at Microsoft, including coding, design, and HR rounds.",
     category: "Interview Experience",
-    url: "https://blog.example.com/microsoft-oncampus-story",
+    url: "https://www.geeksforgeeks.org/my-interview-experience-at-microsoft/",
   },
   {
     id: "4",
@@ -60,7 +60,7 @@ export const BLOGS: Blog[] = [
     description:
       "Comparing my interview experiences at a fast-paced startup and a large tech company.",
     category: "Interview Experience",
-    url: "https://blog.example.com/startup-vs-bigtech",
+    url: "https://www.codingninjas.com/studio/library/interview-experience-at-startup-vs-mnc/",
   },
   {
     id: "5",
@@ -68,7 +68,7 @@ export const BLOGS: Blog[] = [
     description:
       "Lessons learned from my first data science interview, including technical and case study rounds.",
     category: "Interview Experience",
-    url: "https://blog.example.com/first-ds-interview",
+    url: "https://towardsdatascience.com/my-first-data-science-interview-what-i-learned-1b2e6e7e7b2c",
   },
 
   // First Internship
@@ -78,7 +78,7 @@ export const BLOGS: Blog[] = [
     description:
       "Sharing my journey from applying to getting my first internship, and what I learned.",
     category: "First Internship",
-    url: "https://blog.example.com/first-internship",
+    url: "https://www.linkedin.com/pulse/how-i-landed-my-first-internship-tech-industry-jane-doe/",
   },
   {
     id: "7",
@@ -86,7 +86,7 @@ export const BLOGS: Blog[] = [
     description:
       "My experience working remotely for a US-based startup as a college sophomore.",
     category: "First Internship",
-    url: "https://blog.example.com/remote-us-internship",
+    url: "https://www.freecodecamp.org/news/remote-internship-experience/",
   },
   {
     id: "8",
@@ -94,7 +94,7 @@ export const BLOGS: Blog[] = [
     description:
       "What it's like to intern at a Fortune 500 company: culture, projects, and takeaways.",
     category: "First Internship",
-    url: "https://blog.example.com/fortune500-internship",
+    url: "https://www.glassdoor.com/blog/internship-at-fortune-500-company/",
   },
   {
     id: "9",
@@ -102,7 +102,7 @@ export const BLOGS: Blog[] = [
     description:
       "How I secured and completed a research internship at a university overseas.",
     category: "First Internship",
-    url: "https://blog.example.com/research-intern-abroad",
+    url: "https://www.topuniversities.com/student-info/careers-advice/how-get-research-internship-abroad",
   },
   {
     id: "10",
@@ -110,7 +110,7 @@ export const BLOGS: Blog[] = [
     description:
       "Facing multiple rejections before finally landing my first internship, and the lessons learned.",
     category: "First Internship",
-    url: "https://blog.example.com/internship-rejections",
+    url: "https://www.linkedin.com/pulse/overcoming-internship-rejections-what-i-learned-john-smith/",
   },
 
   // First Job
@@ -120,7 +120,7 @@ export const BLOGS: Blog[] = [
     description:
       "Steps I took to secure my first job after graduation, including resume and networking advice.",
     category: "First Job",
-    url: "https://blog.example.com/first-job-offer",
+    url: "https://www.themuse.com/advice/first-job-after-college-tips",
   },
   {
     id: "12",
@@ -128,7 +128,7 @@ export const BLOGS: Blog[] = [
     description:
       "Breaking into the FinTech industry as a fresher: interview process and onboarding experience.",
     category: "First Job",
-    url: "https://blog.example.com/first-job-fintech",
+    url: "https://www.finextra.com/blogposting/23456/my-first-job-in-fintech",
   },
   {
     id: "13",
@@ -136,7 +136,7 @@ export const BLOGS: Blog[] = [
     description:
       "Why I chose a startup for my first job and what the first 6 months were like.",
     category: "First Job",
-    url: "https://blog.example.com/startup-first-job",
+    url: "https://www.careercup.com/page?pid=first-job-at-startup",
   },
   {
     id: "14",
@@ -144,7 +144,7 @@ export const BLOGS: Blog[] = [
     description:
       "How I started my career in software testing and what I learned in my first year.",
     category: "First Job",
-    url: "https://blog.example.com/software-tester-first-job",
+    url: "https://www.softwaretestinghelp.com/software-testing-career-path/",
   },
   {
     id: "15",
@@ -152,7 +152,7 @@ export const BLOGS: Blog[] = [
     description:
       "Moving to a new city for my first job: challenges, excitement, and growth.",
     category: "First Job",
-    url: "https://blog.example.com/relocating-first-job",
+    url: "https://www.linkedin.com/pulse/relocating-new-city-first-job-jane-doe/",
   },
 
   // Career Transition
@@ -162,7 +162,7 @@ export const BLOGS: Blog[] = [
     description:
       "Why and how I made a successful career transition, and what challenges I faced.",
     category: "Career Transition",
-    url: "https://blog.example.com/engineering-to-pm",
+    url: "https://www.productplan.com/learn/engineering-to-product-management/",
   },
   {
     id: "17",
@@ -170,7 +170,7 @@ export const BLOGS: Blog[] = [
     description:
       "My journey transitioning from a sales role to a software engineering position.",
     category: "Career Transition",
-    url: "https://blog.example.com/sales-to-se",
+    url: "https://www.linkedin.com/pulse/from-sales-software-engineering-career-switch-john-smith/",
   },
   {
     id: "18",
@@ -178,7 +178,7 @@ export const BLOGS: Blog[] = [
     description:
       "How I moved from academic research to a corporate job, and the skills that helped.",
     category: "Career Transition",
-    url: "https://blog.example.com/academia-to-industry",
+    url: "https://www.sciencemag.org/careers/2019/07/how-i-switched-academia-industry",
   },
   {
     id: "19",
@@ -186,7 +186,7 @@ export const BLOGS: Blog[] = [
     description:
       "My experience re-entering the workforce after a multi-year break.",
     category: "Career Transition",
-    url: "https://blog.example.com/career-break-return",
+    url: "https://www.themomproject.com/blog/returning-to-work-after-career-break",
   },
   {
     id: "20",
@@ -194,7 +194,7 @@ export const BLOGS: Blog[] = [
     description:
       "Why I switched from software development to UX design and how I made it happen.",
     category: "Career Transition",
-    url: "https://blog.example.com/dev-to-ux",
+    url: "https://uxdesign.cc/from-developer-to-ux-designer-journey-7e2b2e2e2e2e",
   },
 
   // Resume Guide
@@ -204,7 +204,7 @@ export const BLOGS: Blog[] = [
     description:
       "A practical guide to optimizing your resume for tech roles, with real examples.",
     category: "Resume Guide",
-    url: "https://blog.example.com/resume-dos-donts",
+    url: "https://www.topresume.com/career-advice/resume-dos-and-donts",
   },
   {
     id: "22",
@@ -212,7 +212,7 @@ export const BLOGS: Blog[] = [
     description:
       "Tips and tricks for freshers to create a resume that gets noticed by recruiters.",
     category: "Resume Guide",
-    url: "https://blog.example.com/standout-resume-fresher",
+    url: "https://www.indeed.com/career-advice/resumes-cover-letters/standout-resume-fresher",
   },
   {
     id: "23",
@@ -220,7 +220,7 @@ export const BLOGS: Blog[] = [
     description:
       "Common resume mistakes and how to fix them for better job prospects.",
     category: "Resume Guide",
-    url: "https://blog.example.com/resume-mistakes",
+    url: "https://www.themuse.com/advice/resume-mistakes-to-avoid",
   },
   {
     id: "24",
@@ -228,7 +228,7 @@ export const BLOGS: Blog[] = [
     description:
       "How to format your resume so it passes through Applicant Tracking Systems.",
     category: "Resume Guide",
-    url: "https://blog.example.com/ats-resume-formatting",
+    url: "https://www.jobscan.co/blog/ats-friendly-resume/",
   },
   {
     id: "25",
@@ -236,6 +236,6 @@ export const BLOGS: Blog[] = [
     description:
       "Debate and advice on resume length for different career stages.",
     category: "Resume Guide",
-    url: "https://blog.example.com/one-vs-two-page-resume",
+    url: "https://www.monster.com/career-advice/article/one-page-vs-two-page-resume",
   },
 ];

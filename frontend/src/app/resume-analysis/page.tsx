@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { JobMatchCard } from "@/components/JobMatchCard";
 
 const ML_BASE_URL =
@@ -34,6 +35,7 @@ interface ExtractResponse {
 }
 
 export default function ResumeAnalysisPage() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -41,11 +43,50 @@ export default function ResumeAnalysisPage() {
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [rawTextPreview, setRawTextPreview] = useState<string>("");
   const [jobDescription, setJobDescription] = useState<string>("");
+  const [saveStatus, setSaveStatus] = useState<string>("");
+  const [saveError, setSaveError] = useState<string>("");
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [resumeName, setResumeName] = useState<string>("");
+  // Save resume and analysis to backend
+  const handleSaveResume = async () => {
+    if (!file || !analysis) return;
+    setSaveStatus("Saving...");
+    setSaveError("");
+    try {
+      const apiBase =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("resume", file);
+      formData.append("analysis", JSON.stringify(analysis));
+      formData.append("resume_name", resumeName || file.name);
+      const res = await fetch(`${apiBase}/resumes/save`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: formData,
+      });
+      const body = await res.json();
+      if (!res.ok || !body.success) {
+        throw new Error(body?.message || "Failed to save resume");
+      }
+      setSaveStatus("Resume saved!");
+      setShowSaveDialog(false);
+      setResumeName("");
+      // Optionally, redirect to My Resumes or show a link
+      setTimeout(() => setSaveStatus(""), 2000);
+      window.dispatchEvent(new CustomEvent("resumesUpdated"));
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Failed to save resume",
+      );
+      setSaveStatus("");
+    }
+  };
 
   const skillCount = useMemo(() => analysis?.skills?.length || 0, [analysis]);
   const atsScore = useMemo(
     () => (analysis?.ats_score !== undefined ? analysis.ats_score : null),
-    [analysis]
+    [analysis],
   );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,19 +165,16 @@ export default function ResumeAnalysisPage() {
       if (jobDescription.trim().length > 0) {
         setStatus("Matching resume with job description...");
 
-        const jobMatchRes = await fetch(
-          `${ML_BASE_URL}/resume/job-match`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              resume_analysis: analyzeData,
-              job_description: jobDescription,
-            }),
-          }
-        );
+        const jobMatchRes = await fetch(`${ML_BASE_URL}/resume/job-match`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            resume_analysis: analyzeData,
+            job_description: jobDescription,
+          }),
+        });
 
         if (jobMatchRes.ok) {
           const jobMatchData = await jobMatchRes.json();
@@ -149,7 +187,6 @@ export default function ResumeAnalysisPage() {
           };
         }
       }
-
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unexpected error";
       setError(message);
@@ -174,7 +211,11 @@ export default function ResumeAnalysisPage() {
         </div>
       );
     }
-    return <p className="text-sm text-zinc-500">No skills returned by the service.</p>;
+    return (
+      <p className="text-sm text-zinc-500">
+        No skills returned by the service.
+      </p>
+    );
   };
 
   const renderSections = () => {
@@ -191,7 +232,9 @@ export default function ResumeAnalysisPage() {
             <span
               className={`h-2.5 w-2.5 rounded-full ${present ? "bg-emerald-500" : "bg-zinc-400"}`}
             />
-            <span className="capitalize text-zinc-800 dark:text-zinc-100">{key}</span>
+            <span className="capitalize text-zinc-800 dark:text-zinc-100">
+              {key}
+            </span>
             <span className="ml-auto text-xs text-zinc-500">
               {present ? "Present" : "Missing"}
             </span>
@@ -204,7 +247,11 @@ export default function ResumeAnalysisPage() {
   const renderFeedback = () => {
     const feedbackList = analysis?.feedback || analysis?.missing_keywords || [];
     if (!feedbackList.length) {
-      return <p className="text-sm text-zinc-500">No feedback provided by the service.</p>;
+      return (
+        <p className="text-sm text-zinc-500">
+          No feedback provided by the service.
+        </p>
+      );
     }
     return (
       <ul className="space-y-2 text-sm text-zinc-800 dark:text-zinc-100">
@@ -219,13 +266,16 @@ export default function ResumeAnalysisPage() {
   };
 
   const renderScoreBar = () => {
-    if (atsScore === null) return <p className="text-sm text-zinc-500">ATS score not returned.</p>;
+    if (atsScore === null)
+      return <p className="text-sm text-zinc-500">ATS score not returned.</p>;
     const clamped = Math.max(0, Math.min(100, atsScore ?? 0));
     return (
       <div>
         <div className="mb-2 flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-300">
           <span>ATS Score</span>
-          <span className="font-semibold text-zinc-900 dark:text-white">{clamped}%</span>
+          <span className="font-semibold text-zinc-900 dark:text-white">
+            {clamped}%
+          </span>
         </div>
         <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
           <div
@@ -234,7 +284,8 @@ export default function ResumeAnalysisPage() {
           />
         </div>
         <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-          Higher ATS scores mean your resume is structured and keyword-aligned for typical screening systems.
+          Higher ATS scores mean your resume is structured and keyword-aligned
+          for typical screening systems.
         </p>
       </div>
     );
@@ -259,7 +310,8 @@ export default function ResumeAnalysisPage() {
             Analyze your resume and view ATS insights
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Upload a PDF or DOCX file. We will extract the content, run ATS-style checks, and highlight skills.
+            Upload a PDF or DOCX file. We will extract the content, run
+            ATS-style checks, and highlight skills.
           </p>
         </div>
 
@@ -318,13 +370,15 @@ export default function ResumeAnalysisPage() {
                   <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-4 shadow-sm">
                     <div className="mb-3 flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-blue-500" />
-                      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-300">Extracted preview</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
+                        Extracted preview
+                      </p>
                     </div>
                     <div
                       className="max-h-48 overflow-y-auto rounded-lg border border-zinc-700 bg-black p-3 font-mono text-xs leading-relaxed text-zinc-200"
                       style={{
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: '#52525b #27272a'
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#52525b #27272a",
                       }}
                     >
                       <style jsx>{`
@@ -344,7 +398,8 @@ export default function ResumeAnalysisPage() {
                         }
                       `}</style>
                       <p className="whitespace-pre-wrap">
-                        {rawTextPreview} {rawTextPreview.length >= 800 ? "..." : ""}
+                        {rawTextPreview}{" "}
+                        {rawTextPreview.length >= 800 ? "..." : ""}
                       </p>
                     </div>
                   </div>
@@ -376,8 +431,12 @@ export default function ResumeAnalysisPage() {
               <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">ATS Score</p>
-                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Application Tracking Insights</h2>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                      ATS Score
+                    </p>
+                    <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
+                      Application Tracking Insights
+                    </h2>
                   </div>
                   <div className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">
                     {skillCount} skills detected
@@ -390,8 +449,12 @@ export default function ResumeAnalysisPage() {
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">Skills</p>
-                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Matched Skills</h3>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                        Skills
+                      </p>
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                        Matched Skills
+                      </h3>
                     </div>
                   </div>
                   {isLoading ? renderLoading() : renderSkills()}
@@ -400,33 +463,114 @@ export default function ResumeAnalysisPage() {
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">Structure</p>
-                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Section Coverage</h3>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                        Structure
+                      </p>
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                        Section Coverage
+                      </h3>
                     </div>
                   </div>
-                  {isLoading ? renderLoading() : renderSections() || (
-                    <p className="text-sm text-zinc-500">Section details were not returned by the service.</p>
-                  )}
+                  {isLoading
+                    ? renderLoading()
+                    : renderSections() || (
+                        <p className="text-sm text-zinc-500">
+                          Section details were not returned by the service.
+                        </p>
+                      )}
                 </div>
               </div>
 
               <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">Feedback</p>
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Improvement Suggestions</h3>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                      Feedback
+                    </p>
+                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                      Improvement Suggestions
+                    </h3>
                   </div>
                 </div>
                 {isLoading ? renderLoading() : renderFeedback()}
               </div>
 
+              {/* Save Resume Button & Dialog */}
+              {!isLoading && analysis && file && (
+                <div className="flex flex-col gap-2">
+                  <button
+                    className="rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-green-700 transition-colors w-fit"
+                    onClick={() => setShowSaveDialog(true)}
+                  >
+                    Save Resume
+                  </button>
+                  {saveStatus && (
+                    <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-200">
+                      {saveStatus}
+                    </div>
+                  )}
+                  {saveError && (
+                    <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-200">
+                      {saveError}
+                    </div>
+                  )}
+                  {/* Save Dialog */}
+                  {showSaveDialog && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                      <div
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setShowSaveDialog(false)}
+                      />
+                      <div className="relative z-10 w-full max-w-md mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl overflow-hidden">
+                          <div className="p-6 pb-4">
+                            <h3 className="text-lg font-semibold text-white mb-2">
+                              Save Resume
+                            </h3>
+                            <label className="block text-sm font-medium text-zinc-300 mb-1">
+                              Resume Name
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 text-white px-3 py-2 text-sm mb-4"
+                              value={resumeName}
+                              onChange={(e) => setResumeName(e.target.value)}
+                              placeholder={file.name}
+                            />
+                            <div className="flex gap-3 justify-end">
+                              <button
+                                onClick={() => setShowSaveDialog(false)}
+                                className="px-4 py-2.5 rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-300 font-medium hover:bg-zinc-800 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={handleSaveResume}
+                                className="px-4 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors"
+                                disabled={saveStatus === "Saving..."}
+                              >
+                                {saveStatus === "Saving..."
+                                  ? "Saving..."
+                                  : "Save"}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* End Save Resume Button & Dialog */}
+              {/* No analysis yet block */}
               {!isLoading && !analysis && !error && (
                 <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
                   <p className="text-lg font-semibold text-zinc-900 dark:text-white">
                     No analysis yet
                   </p>
                   <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                    Upload a resume and run analysis to see ATS score, skills, and feedback here.
+                    Upload a resume and run analysis to see ATS score, skills,
+                    and feedback here.
                   </p>
                 </div>
               )}

@@ -265,15 +265,60 @@ export default function ResumeCard({
 
       {/* Action Buttons */}
       <div className="grid grid-cols-3 gap-2 mt-6">
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 text-center text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors no-underline flex items-center justify-center gap-1"
+        <button
+          onClick={() => {
+            // Open analysis in a new tab with clean UI
+            const win = window.open();
+            if (!win) return;
+            win.document
+              .write(`<!DOCTYPE html><html><head><title>Resume Analysis - ${resume_name || filename}</title><meta name='viewport' content='width=device-width,initial-scale=1'>
+            <style>
+              body { background: #0a0a0a; color: #fff; font-family: 'Inter',sans-serif; margin: 0; padding: 0; }
+              .container { max-width: 700px; margin: 40px auto; background: #18181b; border-radius: 18px; box-shadow: 0 4px 32px #0002; padding: 2.5rem 2rem; }
+              h1 { font-size: 2rem; margin-bottom: 1.5rem; color: #60a5fa; }
+              h2 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; color: #a5b4fc; }
+              .score { font-size: 1.5rem; color: #22d3ee; margin-bottom: 1.5rem; }
+              .section { margin-bottom: 1.5rem; }
+              .pill { display: inline-block; background: #27272a; color: #60a5fa; border-radius: 999px; padding: 0.3em 1em; margin: 0.2em 0.2em 0 0; font-size: 0.95em; }
+              ul { margin: 0.5em 0 0 1.2em; }
+              li { margin-bottom: 0.4em; }
+            </style></head><body><div class='container'>
+            <h1>Resume Analysis</h1>
+            <div class='score'>ATS Score: ${analysis?.ats_score ?? "—"}%</div>
+            <div class='section'><h2>Skills</h2>${
+              analysis?.skills && analysis.skills.length
+                ? analysis.skills
+                    .map((s) => `<span class='pill'>${s}</span>`)
+                    .join("")
+                : "<span style='color:#888'>No skills detected.</span>"
+            }
+            </div>
+            <div class='section'><h2>Section Coverage</h2>${
+              analysis?.sections
+                ? Object.entries(analysis.sections)
+                    .map(
+                      ([k, v]) =>
+                        `<span class='pill' style='background:${v ? "#166534" : "#444"};color:${v ? "#bbf7d0" : "#fff"}'>${k}: ${v ? "Yes" : "No"}</span>`,
+                    )
+                    .join("")
+                : "<span style='color:#888'>No section data.</span>"
+            }
+            </div>
+            <div class='section'><h2>Feedback</h2>${
+              analysis?.feedback && analysis.feedback.length
+                ? `<ul>${analysis.feedback.map((f) => `<li>${f}</li>`).join("")}</ul>`
+                : "<span style='color:#888'>No feedback.</span>"
+            }
+            </div>
+            <div class='section'><h2>Readability</h2>${analysis?.readability ?? "—"}</div>
+            </div></body></html>`);
+            win.document.close();
+          }}
+          className="px-3 py-2 rounded-lg border border-blue-400 text-center text-xs font-medium text-blue-400 hover:bg-blue-950 hover:text-white transition-colors no-underline flex items-center justify-center gap-1"
         >
           <FontAwesomeIcon icon={faEye} className="text-sm" />
-          View
-        </a>
+          View Analysis
+        </button>
         <button
           onClick={() => {
             // Create download link with proper Cloudinary parameters

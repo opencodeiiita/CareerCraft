@@ -1,3 +1,71 @@
+// Save resume and analysis directly (no re-analysis)
+export const saveResumeWithAnalysis = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
+    if (!req.body.analysis) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No analysis provided" });
+    }
+    // Upload to Cloudinary
+    const cloudinaryResult = await uploadToCloudinary(req.file);
+    const url = cloudinaryResult.secure_url;
+    const publicId = cloudinaryResult.public_id;
+    if (!url) {
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Failed to get file URL from Cloudinary",
+        });
+    }
+    // Parse analysis
+    let analysisResult;
+    try {
+      analysisResult = JSON.parse(req.body.analysis);
+    } catch (e) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid analysis JSON" });
+    }
+    // Save resume
+    const resume = new Resume({
+      userId: req.user?._id,
+      filename: req.file.originalname,
+      resumeName: req.body?.resume_name || req.file.originalname,
+      url,
+      publicId,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      resumeText: undefined, // Not extracted here
+      analysisResult,
+      uploadedAt: new Date(),
+    });
+    const savedResume = await resume.save();
+    const response = {
+      success: true,
+      resume: {
+        id: savedResume._id,
+        filename: savedResume.filename,
+        resume_name: savedResume.resumeName || savedResume.filename,
+        url: savedResume.url,
+        uploadedAt: savedResume.uploadedAt,
+        created_at: savedResume.createdAt,
+        ats_score: savedResume.analysisResult?.ats_score ?? null,
+        analysis: savedResume.analysisResult || null,
+      },
+    };
+    return res.json(response);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", error: err.message });
+  }
+};
 import Resume from "../models/resume.model.js";
 import { uploadToCloudinary } from "../middleware/upload.middleware.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -65,7 +133,7 @@ export const uploadResume = async (req, res) => {
         if (cachedMatch) {
           jobMatchResult = JSON.parse(cachedMatch);
         }
-      } catch (e) { }
+      } catch (e) {}
     }
 
     try {
@@ -197,16 +265,16 @@ export const deleteResume = async (req, res) => {
       try {
         const resumeHash = resume.resumeText
           ? require("crypto")
-            .createHash("sha256")
-            .update(resume.resumeText)
-            .digest("hex")
+              .createHash("sha256")
+              .update(resume.resumeText)
+              .digest("hex")
           : null;
         if (resumeHash) {
           await redis.del(`resume:analysis:${resumeHash}`);
           // Optionally, delete job match keys if you have job hashes stored or can enumerate them
           // Example: await redis.del(`jobmatch:${resumeHash}:*`); // Requires Redis scan/del for pattern
         }
-      } catch (e) { }
+      } catch (e) {}
     }
     if (!resume) {
       return res

@@ -24,6 +24,7 @@ export interface ResumeAnalysisResponse {
     description: string;
     technologies: string[];
   }>;
+  missing_skills?: string[];
 }
 
 export interface CoverLetterRequest {
@@ -47,6 +48,7 @@ export interface CoverLetterResponse {
     sign_off: string;
     candidate_name: string;
   };
+  missing_skills?: string[];
 }
 
 export async function analyzeResume(resumeText: string): Promise<ResumeAnalysisResponse> {

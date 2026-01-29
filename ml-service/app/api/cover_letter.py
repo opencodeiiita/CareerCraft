@@ -5,6 +5,7 @@ import logging
 import json
 
 from app.services.cover_letter_generator import CoverLetterGenerator
+from app.services.job_matcher import match_job_with_resume
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -37,6 +38,7 @@ class CoverLetterResponse(BaseModel):
     job_title: str
     tone: str
     cover_letter: Dict[str, Any]
+    missing_skills: Optional[List[str]] = None
 
 
 class HealthResponse(BaseModel):
@@ -102,6 +104,18 @@ async def generate_cover_letter(request: CoverLetterRequest):
             # Note: In production, you'd modify the LLM client to accept these params
             # For now, we'll use the defaults
 
+        # Calculate missing skills using job matcher
+        try:
+            job_match_result = match_job_with_resume(
+                resume_analysis=request.resume_analysis,
+                job_description=request.job_info["job_description"]
+            )
+            missing_skills = job_match_result.get("missing_skills", [])
+        except Exception:
+            # Fallback if matching fails, don't block cover letter generation
+            logger.exception("Failed to compute missing skills during cover letter generation")
+            missing_skills = []
+
         # Ensure proper JSON structure
         structured_cover_letter = _ensure_json_structure(result)
 
@@ -110,6 +124,7 @@ async def generate_cover_letter(request: CoverLetterRequest):
             "job_title": request.job_info["job_title"],
             "tone": tone,
             "cover_letter": structured_cover_letter,
+            "missing_skills": missing_skills
         }
 
     except ValueError as e:

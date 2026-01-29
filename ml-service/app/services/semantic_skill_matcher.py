@@ -30,8 +30,9 @@ def get_model() -> SentenceTransformer:
 
 
 # Similarity thresholds
-MATCH_THRESHOLD = 0.70  # Strong match
-PARTIAL_THRESHOLD = 0.50  # Partial/related match
+# Similarity thresholds
+MATCH_THRESHOLD = 0.90  # Almost exact match
+PARTIAL_THRESHOLD = 0.80  # Strict partial match to ensure Java != JavaScript
 
 
 def compute_skill_embeddings(skills: List[str]) -> np.ndarray:

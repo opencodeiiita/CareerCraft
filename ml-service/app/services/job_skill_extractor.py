@@ -44,6 +44,28 @@ SOFT_SKILLS = {
     "self motivated", "collaborative", "flexible", "motivated"
 }
 
+# Generic terms to filter out
+GENERIC_TERMS = {
+    "designers", "engineers", "managers", "developers", "end", "requirements",
+    "designs", "specifications", "environment", "application", "system",
+    "solutions", "clients", "users", "team", "project", "role", "work",
+    "experience", "knowledge", "skills", "ability", "understanding",
+    "technologies", "tools", "platforms", "languages", "frameworks", "libraries", 
+    "concepts", "principles", "best practices", "methodologies", "other",
+    "technical", "product", "software", "processes", "support", "services",
+    "orchestration", "containerization"
+}
+
+# Whitelist of common technologies to always extract if present
+COMMON_TECH_STACK = {
+    "java", "python", "c", "c++", "c#", ".net", "rust", "golang", "swift", "kotlin", "php", "ruby", "scala",
+    "typescript", "javascript", "js", "react", "angular", "vue", "next.js", "node.js", "express", "django", "flask", "fastapi", "spring boot", "spring",
+    "docker", "kubernetes", "k8s", "aws", "azure", "gcp", "sql", "mysql", "postgresql", "mongodb", "redis", "elasticsearch",
+    "git", "github", "gitlab", "linux", "bash", "html", "css", "sass", "graphql", "rest api",
+    "terraform", "ansible", "jenkins", "circleci", "pytorch", "tensorflow", "keras", "pandas", "numpy", "scikit-learn",
+    "excel", "power bi", "tableau", "jira", "confluence", "figma"
+}
+
 
 def extract_skill_sections(job_description: str) -> str:
     """
@@ -140,10 +162,48 @@ def extract_technical_skills(text: str) -> List[str]:
         skill = clean_and_normalize_skill(chunk.text)
         
         # Filter out soft skills and very short/long phrases
+        if skill in SOFT_SKILLS or skill in GENERIC_TERMS:
+            continue
+            
+        # Aggressive cleaning: Remove common non-skill prefixes
+        prefixes_to_strip = ["technical ", "other ", "strong ", "proven ", "excellent ", "good ", "demonstrated ", "proficient ", "solid "]
+        for prefix in prefixes_to_strip:
+            if skill.startswith(prefix):
+                skill = skill[len(prefix):].strip()
+        
+        # Re-check validity after stripping
+        if not skill or len(skill) < 2:
+            continue
+            
+        # split again to check length
+        parts = skill.split()
+        
+        # Filter: Phrases ending with generic roles/artifacts
+        # e.g. "product managers", "technical designs", "software engineers", "strong understanding"
+        bad_suffixes = {
+            "managers", "engineers", "developers", "designs", "requirements", 
+            "specifications", "teams", "clients", "users", "environments",
+            "understanding", "knowledge", "familiarity", "proficiency", "experience"
+        }
+        if parts[-1] in bad_suffixes:
+            continue
+            
         if (skill and 
             len(skill) >= 2 and 
-            len(skill.split()) <= 4 and
-            skill not in SOFT_SKILLS):
+            len(parts) <= 4 and
+            skill not in SOFT_SKILLS and
+            skill not in GENERIC_TERMS):
+            
+            # Additional heuristic: Single lowercase words are often not tech skills unless well-known
+            # (matches "java", "python", "agile" but filters "end", "designers" etc if they slip through)
+            if len(parts) == 1 and skill.islower() and len(skill) < 4 and skill not in ["git", "aws", "sql"]:
+                 continue
+                 
+            # If it's a known generic term ending in 's', filter it (e.g. "managers")
+            if skill.endswith('s') and skill[:-1] in GENERIC_TERMS:
+                continue
+
+            skills.add(skill)
             skills.add(skill)
     
     # Extract named entities (PRODUCT, ORG) as potential tech skills
@@ -168,7 +228,23 @@ def extract_technical_skills(text: str) -> List[str]:
             skill = clean_and_normalize_skill(match)
             if skill:
                 skills.add(skill)
-    
+
+    # Dictionary-based extraction for known tech stack (High precision)
+    # This ensures we don't miss "Java", "Python" even if NLP fails
+    text_lower = text.lower()
+    for tech in COMMON_TECH_STACK:
+        # Use regex to find whole words only to avoid substring matching (e.g. "java" in "javascript")
+        # Escape special chars like "+" in "c++"
+        pattern = r'\b' + re.escape(tech) + r'\b'
+        if re.search(pattern, text_lower):
+            skills.add(tech)
+            
+    # Special handling for "Go" programming language
+    # Only match "Go" if it looks like a language (e.g. "Go, Python", "Go/C++", "knowledge of Go")
+    # Avoid matching "go to", "go live", etc.
+    if re.search(r'(?i)(\b(in|with|using|and|or)\s+Go\b)|(\bGo\s*[,/])|([,/]\s*Go\b)', text):
+        skills.add("go")
+
     return list(skills)
 
 

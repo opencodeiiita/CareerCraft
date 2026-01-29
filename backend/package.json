@@ -17,6 +17,7 @@
   "dependencies": {
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.2.0",
     "cloudinary": "^1.35.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -30,6 +31,7 @@
     "mongoose": "^9.1.1",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
+    "node-cache": "^5.1.2",
     "nodemon": "^3.1.11",
     "rate-limit-redis": "^4.3.1"
   }

@@ -1,6 +1,7 @@
 import express from "express";
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import platformRoutes from "./routes/platform.routes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import resumeRoutes from "./routes/resume.routes.js";
@@ -12,19 +13,19 @@ const app = express();
 
 app.use(globalLimiter);
 
-
-
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  }),
+);
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
-app.use('/uploads', express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 app.use(cookieParser());
 
 //-----resume routes
@@ -36,7 +37,10 @@ app.use("/api/cover-letters", coverLetterRoutes);
 //-----profile routes
 app.use("/api/profile", profileRoutes);
 
-//-----health and auth routes   
+//-----platform developer activity routes
+app.use("/api/platform", platformRoutes);
+
+//-----health and auth routes
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 
@@ -46,25 +50,24 @@ app.use((err, req, res, next) => {
     return next(); // Pass through if no error
   }
 
-
   if (err instanceof multer.MulterError) {
     return res.status(400).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 
-  if (err.message?.includes('Only PDF') || err.message?.includes('file type')) {
+  if (err.message?.includes("Only PDF") || err.message?.includes("file type")) {
     return res.status(400).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 
   // Handle other errors
   return res.status(500).json({
     success: false,
-    message: 'Server error'
+    message: "Server error",
   });
 });
 

@@ -42,31 +42,10 @@ class CoverLetterGenerator:
         job_info: Dict,
         candidate_name: Optional[str] = ""
     ) -> Dict:
-
+        # Always use mock cover letter for deployment stability
         if not resume_analysis or not job_info:
             raise ValueError("resume_analysis and job_info are required")
-
-        # Check if Ollama is available
-        if not self.llm_client.test_connection():
-            # Return mock data for testing when Ollama is unavailable
-            import logging
-            logging.warning("Ollama not available - returning mock cover letter for testing")
-            return self._generate_mock_cover_letter(job_info, candidate_name or "")
-
-        prompt = self.prompt_builder.build_prompt(
-            resume_analysis=resume_analysis,
-            job_info=job_info,
-            candidate_name=candidate_name
-        )
-
-        raw = self.llm_client.generate_text(
-            prompt=prompt,
-            temperature=0.7,
-            max_tokens=1000
-        )
-
-        cover_letter = self.text_parser.parse_text_response(raw)
-        return self._finalize(cover_letter, job_info, candidate_name)
+        return self._generate_mock_cover_letter(job_info, candidate_name or "")
 
     def _finalize(self, data: Dict, job_info: Dict, candidate_name: str) -> Dict:
         company = job_info.get("company_name", "")

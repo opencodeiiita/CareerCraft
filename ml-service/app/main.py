@@ -5,6 +5,9 @@ from app.api import resume,health,cover_letter
 
 app = FastAPI(title = "CareerCraft ML Service")
 
+# Detect port for cloud deployment (optional, for local testing)
+PORT = int(os.environ.get("PORT", 8001))
+
 # Allow all origins for local development
 app.add_middleware(
     CORSMiddleware,
